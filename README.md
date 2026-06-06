@@ -50,4 +50,4 @@ Sistem pemberi pakan kucing otomatis berbasis ESP32 dan Blynk.
 
 ## Author
 
-Ashura Ken
+Gandul
