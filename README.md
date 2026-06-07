@@ -54,7 +54,7 @@ https://wokwi.com/projects/466122841372134401
 | Durasi Pengisian | 5 detik |
 | Interval Pembacaan Sensor | 2 detik |
 
-// akan direvisi sesuai kondisi asli
+'* akan direvisi sesuai kondisi asli
 
   
 ### Status Tabung
