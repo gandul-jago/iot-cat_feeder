@@ -47,7 +47,7 @@ https://wokwi.com/projects/466122841372134401
 
 | Parameter | Nilai |
 |------------|--------|
-| Tinggi Tabung Pakan | 30 cm |
+| Tinggi Tabung Pakan | 25 cm |
 | Batas Mangkuk Kosong | > 10 cm |
 | Sudut Servo Tertutup | 0° |
 | Sudut Servo Terbuka | 90° |
