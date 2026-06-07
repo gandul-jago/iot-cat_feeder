@@ -1,6 +1,6 @@
-#define BLYNK_TEMPLATE_ID "TMPL6k_AVnqlD"
+#define BLYNK_TEMPLATE_ID ""
 #define BLYNK_TEMPLATE_NAME "cat feeder"
-#define BLYNK_AUTH_TOKEN "QNyxLXsoAIFyS0GMkDDmqxfBbMQqdIhn"
+#define BLYNK_AUTH_TOKEN ""
 
 #include <WiFi.h>
 #include <BlynkSimpleEsp32.h>
