@@ -53,7 +53,9 @@ https://wokwi.com/projects/466122841372134401
 | Sudut Servo Terbuka | 90° |
 | Durasi Pengisian | 5 detik |
 | Interval Pembacaan Sensor | 2 detik |
+* akan direvisi sesuai kondisi asli
 
+  
 ### Status Tabung
 
 | Persentase Stok | Status  |
