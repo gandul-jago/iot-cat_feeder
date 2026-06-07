@@ -36,7 +36,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define PINTU_TUTUP 0
 #define PINTU_BUKA 90
 
-float tinggiTabung = 30.0;
+float tinggiTabung = 25.0;
 
 unsigned long lastSensor = 0;
 
