@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "author": "ashura ken",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic",
+      "top": -152.1,
+      "left": 91.9,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo",
+      "top": 120,
+      "left": 150,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_merah",
+      "top": 100,
+      "left": -150,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_hijau",
+      "top": 100,
+      "left": -100,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_m",
+      "top": 150,
+      "left": -150,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_h",
+      "top": 147.95,
+      "left": -96,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic2",
+      "top": -36.9,
+      "left": 303.1,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 294.4,
+      "left": 226.4,
+      "attrs": { "pins": "i2c" }
+    }
+  ],
+  "connections": [
+    ["esp:5V", "ultrasonic:VCC", "red", ["h-43.01", "v-220.8", "h259.7"]],
+    ["esp:5", "ultrasonic:TRIG", "green", ["h33.64", "v-140.7"]],
+    ["esp:5V", "servo:V+", "red", ["v0"]],
+    ["esp:19", "servo:PWM", "orange", ["v0"]],
+    ["esp:5V", "lcd:VCC", "red", ["v0"]],
+    ["esp:GND.3", "lcd:GND", "black", ["v0"]],
+    ["esp:21", "lcd:SDA", "cyan", ["v0"]],
+    ["esp:22", "lcd:SCL", "purple", ["v0"]],
+    ["esp:25", "led_merah:A", "red", ["v0"]],
+    ["esp:26", "led_hijau:A", "green", ["v0"]],
+    ["led_merah:C", "res_m:1", "black", ["v0"]],
+    ["led_hijau:C", "res_h:1", "black", ["v0"]],
+    ["res_m:2", "esp:GND.1", "black", ["v0"]],
+    ["res_h:2", "esp:GND.1", "black", ["v0"]],
+    ["esp:5V", "ultrasonic2:VCC", "red", ["v19.2", "h-23.81", "v-163.2"]],
+    ["esp:16", "ultrasonic2:TRIG", "green", ["h81.64", "v-48", "h173.2"]],
+    ["servo:GND", "esp:GND.1", "black", ["h-25.2", "v60.4", "h-134.4"]],
+    ["esp:GND.1", "ultrasonic2:GND", "black", ["h-4.61", "v96", "h384"]],
+    ["ultrasonic:GND", "esp:GND.1", "black", ["v35.1", "h-280.1", "v144"]],
+    ["ultrasonic:ECHO", "esp:18", "blue", ["v0"]],
+    ["ultrasonic2:ECHO", "esp:17", "blue", ["v0"]],
+    ["lcd1:VCC", "esp:5V", "red", ["h0"]],
+    ["lcd1:GND", "esp:GND.1", "black", ["h0"]],
+    ["esp:21", "lcd1:SDA", "green", ["h62.44", "v163.2"]]
+  ],
+  "dependencies": {}
+}

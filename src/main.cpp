@@ -1,43 +1,145 @@
-#define BLYNK_TEMPLATE_ID ""
-#define BLYNK_TEMPLATE_NAME "" 
-#define BLYNK_AUTH_TOKEN ""
+#define BLYNK_TEMPLATE_ID "TMPL6k_AVnqlD"
+#define BLYNK_TEMPLATE_NAME "cat feeder"
+#define BLYNK_AUTH_TOKEN "QNyxLXsoAIFyS0GMkDDmqxfBbMQqdIhn"
 
 #include <WiFi.h>
 #include <BlynkSimpleEsp32.h>
 #include <ESP32Servo.h>
 #include <LiquidCrystal_I2C.h>
 
-// WiFi
 char ssid[] = "NAMA_WIFI";
 char pass[] = "PASSWORD_WIFI";
 
-// Pin
-#define TRIG_PIN 5
-#define ECHO_PIN 18
+// ======================
+// PIN
+// ======================
+
+#define TRIG_MANGKUK 5
+#define ECHO_MANGKUK 18
+
+#define TRIG_TABUNG 16
+#define ECHO_TABUNG 17
+
 #define SERVO_PIN 19
+
 #define LED_MERAH 25
 #define LED_HIJAU 26
+
+bool sedangMengisi = false;
+bool stokHabis = false;
+
+// ======================
 
 Servo pintuMakanan;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-long duration;
-float distance;
+#define PINTU_TUTUP 0
+#define PINTU_BUKA 90
 
-String statusPakan = "";
+float tinggiTabung = 30.0;
 
-void setup() {
+unsigned long lastSensor = 0;
 
+bool sedangMengisi = false;
+
+// ======================
+// BACA HC-SR04
+// ======================
+
+float bacaJarak(int trigPin, int echoPin)
+{
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH, 30000);
+
+  if(duration == 0)
+    return 999;
+
+  return duration * 0.034 / 2;
+}
+
+// ======================
+// SERVO
+// ======================
+
+void isiPakan()
+{
+  if(stokHabis)
+  {
+    lcd.clear();
+
+    lcd.setCursor(0,0);
+    lcd.print("TABUNG HABIS");
+
+    lcd.setCursor(0,1);
+    lcd.print("TIDAK BISA ISI");
+
+    delay(2000);
+
+    return;
+  }
+
+  if(sedangMengisi) return;
+
+  sedangMengisi = true;
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Mengisi Pakan");
+
+  pintuMakanan.write(PINTU_BUKA);
+
+  delay(5000);
+
+  pintuMakanan.write(PINTU_TUTUP);
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Selesai");
+
+  delay(1000);
+
+  sedangMengisi = false;
+}
+
+// ======================
+// TOMBOL BLYNK
+// ======================
+
+BLYNK_WRITE(V0)
+{
+  if(param.asInt() == 1)
+  {
+    isiPakan();
+  }
+}
+
+// ======================
+
+void setup()
+{
   Serial.begin(115200);
 
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  pinMode(TRIG_MANGKUK, OUTPUT);
+  pinMode(ECHO_MANGKUK, INPUT);
+
+  pinMode(TRIG_TABUNG, OUTPUT);
+  pinMode(ECHO_TABUNG, INPUT);
 
   pinMode(LED_MERAH, OUTPUT);
   pinMode(LED_HIJAU, OUTPUT);
 
+  digitalWrite(LED_MERAH, LOW);
+  digitalWrite(LED_HIJAU, LOW);
+
   pintuMakanan.attach(SERVO_PIN);
-  pintuMakanan.write(0);
+  pintuMakanan.write(PINTU_TUTUP);
 
   lcd.init();
   lcd.backlight();
@@ -49,94 +151,133 @@ void setup() {
 
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("WiFi Connected");
+  lcd.print("Connected");
 
-  delay(2000);
+  delay(1500);
+
   lcd.clear();
 }
 
-// Tombol Blynk V0
-BLYNK_WRITE(V0)
+// ======================
+
+void loop()
 {
-  int tombol = param.asInt();
-
-  if(tombol == 1)
-  {
-    Serial.println("Mengisi Pakan");
-
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Mengisi Pakan");
-
-    pintuMakanan.write(90);
-
-    delay(5000);
-
-    pintuMakanan.write(0);
-
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Pakan Terisi");
-
-    Serial.println("Pakan Terisi");
-  }
-}
-
-void loop() {
-
   Blynk.run();
 
-  // Baca HC-SR04
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-
-  digitalWrite(TRIG_PIN, LOW);
-
-  duration = pulseIn(ECHO_PIN, HIGH);
-
-  distance = duration * 0.034 / 2;
-
-  Serial.print("Jarak: ");
-  Serial.print(distance);
-  Serial.println(" cm");
-
-  if(distance > 15)
+  if(millis() - lastSensor >= 2000)
   {
-    statusPakan = "HABIS";
+    lastSensor = millis();
 
-    digitalWrite(LED_MERAH, HIGH);
-    digitalWrite(LED_HIJAU, LOW);
+    float jarakMangkuk =
+      bacaJarak(TRIG_MANGKUK, ECHO_MANGKUK);
+
+    float jarakTabung =
+      bacaJarak(TRIG_TABUNG, ECHO_TABUNG);
+
+    // =====================
+    // HITUNG STOK TABUNG
+    // =====================
+
+    int stokPersen =
+      ((tinggiTabung - jarakTabung)
+      / tinggiTabung) * 100;
+
+    stokPersen = constrain(stokPersen, 0, 100);
+
+    // =====================
+    // STATUS TABUNG
+    // =====================
+
+    String statusTabung;
+
+    if(stokPersen >= 75)
+    {
+      statusTabung = "PENUH";
+    }
+    else if(stokPersen >= 40)
+    {
+      statusTabung = "SEDANG";
+    }
+    else if(stokPersen >= 10)
+    {
+      statusTabung = "MENIPIS";
+    }
+    else
+    {
+      statusTabung = "HABIS";
+    }
+
+    stokHabis = (statusTabung == "HABIS");
+
+    // =====================
+    // STATUS MANGKUK
+    // =====================
+
+    String statusMangkuk;
+
+    if(jarakMangkuk > 10)
+    {
+      statusMangkuk = "KOSONG";
+    }
+    else
+    {
+      statusMangkuk = "TERISI";
+    }
+
+    // =====================
+    // LED
+    // =====================
+
+    if(statusMangkuk == "KOSONG")
+    {
+      digitalWrite(LED_MERAH, HIGH);
+      digitalWrite(LED_HIJAU, LOW);
+    }
+    else
+    {
+      digitalWrite(LED_MERAH, LOW);
+      digitalWrite(LED_HIJAU, HIGH);
+    }
+
+    // =====================
+    // LCD
+    // =====================
 
     lcd.setCursor(0,0);
-    lcd.print("Pakan Habis  ");
+    lcd.print("M:");
+    lcd.print("        ");
+    lcd.setCursor(2,0);
+    lcd.print(statusMangkuk);
 
     lcd.setCursor(0,1);
-    lcd.print("Isi dari App ");
+    lcd.print("T:");
+    lcd.print("        ");
+    lcd.setCursor(2,1);
+    lcd.print(statusTabung);
 
-    Blynk.virtualWrite(V1, "Pakan Habis");
+    // =====================
+    // SERIAL
+    // =====================
 
-    Serial.println("STATUS: HABIS");
+    Serial.println("================");
+    Serial.print("Mangkuk : ");
+    Serial.println(statusMangkuk);
+
+    Serial.print("Tabung : ");
+    Serial.println(statusTabung);
+
+    Serial.print("Persen : ");
+    Serial.print(stokPersen);
+    Serial.println("%");
+
+    // =====================
+    // BLYNK
+    // =====================
+
+    Blynk.virtualWrite(V1, statusMangkuk);
+    Blynk.virtualWrite(V2, statusTabung);
+    Blynk.virtualWrite(V3, stokPersen);
+    Blynk.virtualWrite(V4, jarakMangkuk);
+    Blynk.virtualWrite(V5, jarakTabung);
   }
-  else
-  {
-    statusPakan = "TERISI";
-
-    digitalWrite(LED_MERAH, LOW);
-    digitalWrite(LED_HIJAU, HIGH);
-
-    lcd.setCursor(0,0);
-    lcd.print("Pakan Terisi ");
-
-    lcd.setCursor(0,1);
-    lcd.print("Siap Makan   ");
-
-    Blynk.virtualWrite(V1, "Pakan Terisi");
-
-    Serial.println("STATUS: TERISI");
-  }
-
-  delay(1000);
 }
