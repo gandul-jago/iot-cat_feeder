@@ -41,6 +41,12 @@ https://wokwi.com/projects/466122841372134401
 | LCD SDA              | 21   |
 | LCD SCL              | 22   |
 
+
+## Wiring Diagram
+
+![Wiring Diagram](wiring%20esp32_bb.png)
+
+
 ## Logika Sistem
 
 ### Parameter Sistem
