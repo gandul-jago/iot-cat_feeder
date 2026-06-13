@@ -117,7 +117,7 @@ Ketika status tabung berubah menjadi HABIS:
 ## Illustrasi Design
 
 
-![Design](ilustrasi%20model_bb.jpeg)
+![Design](ilustrasi%20model.jpeg)
 
 ## Platform dan Library
 
