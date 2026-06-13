@@ -113,6 +113,11 @@ Ketika status tabung berubah menjadi HABIS:
 8. Servo menutup kembali secara otomatis.
 9. Jika stok habis, proses pengisian dibatalkan dan sistem menampilkan peringatan.
 
+
+## Illustrasi Design
+
+
+![Design](ilustrasi%20_model.jpeg)
 ## Platform dan Library
 
 ### Platform
